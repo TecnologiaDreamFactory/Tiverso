@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TIverso Dream Factory</title>
+
+  <link rel="icon" type="image/png" href="IMGS/logo.png">
+
+  <!-- Preconnects for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  
+  <!-- Google Fonts: Montserrat + Space Grotesk -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+
+  <!-- Critical CSS inlined for initial paint -->
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      cursor: default;
+      background: black;
+      font-family: 'Montserrat', 'Space Grotesk', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    canvas { display: block; }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #0088ff;
+      color: #000000;
+      text-align: center;
+      padding: 3px 0;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      z-index: 200;
+      opacity: 0;
+      transform: translateY(100%);
+      transition: opacity 2s ease, transform 2s ease;
+    }
+    footer.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .planet-panel {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      transform: translate(-50%, 100%);
+      width: 70vw;
+      max-width: 900px;
+      height: 95vh;
+      background: rgba(0, 0, 0, 0.70);
+      border: 1px solid #0088ff;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+      transition: transform 0.5s ease;
+      z-index: 100;
+      padding: 20px;
+      box-sizing: border-box;
+      color: #fff;
+      font-family: 'Montserrat', sans-serif;
+      overflow-y: auto;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Space Grotesk', sans-serif;
+      letter-spacing: 0.5px;
+    }
+    #loading {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: black;
+      z-index: 60;
+      pointer-events: none;
+      opacity: 1;
+      transition: opacity 2s ease;
+    }
+    #reset-orbit {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 15;
+      width: 122px; /* Aumentado em 20% adicional (102px * 1.20) */
+      height: 122px; /* Aumentado em 20% adicional (102px * 1.20) */
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 0.9;
+      object-fit: contain;
+    }
+    #reset-orbit:hover {
+      transform: scale(1.35);
+      opacity: 1;
+    }
+    #reset-orbit:active {
+      transform: scale(1.05);
+    }
+    @media (max-width: 768px) {
+      .planet-panel {
+        position: fixed !important;
+        bottom: 0 !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 100vh !important;
+        border-radius: 0 !important;
+        transform: translateY(100%) !important;
+      }
+      #reset-orbit {
+        top: auto !important;
+        bottom: 36px !important; /* Calculado: footer (~16px altura) + dois corpos de texto (20px) = 36px - parte inferior do botão fica a dois corpos acima do footer */
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 110px !important; /* Tamanho reduzido sutilmente */
+        height: 110px !important; /* Tamanho reduzido sutilmente */
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        opacity: 0.9;
+        object-fit: contain;
+      }
+      #reset-orbit:hover {
+        transform: translateX(-50%) scale(1.18);
+        opacity: 1;
+      }
+      #reset-orbit:active {
+        transform: translateX(-50%) scale(1.05);
+      }
+      footer {
+        font-size: 10px;
+        padding: 2px 0;
+        opacity: 0;
+        transform: translateY(100%);
+        transition: opacity 2s ease, transform 2s ease;
+      }
+      footer.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      canvas {
+        touch-action: none;
+      }
+    }
+  </style>
+  
+  <!-- External CSS -->
+  <link rel="stylesheet" href="style.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="style.css"></noscript>
+
+  <style>
+    /* Wrapper para vídeos responsivos */
+    .video-wrapper {
+      margin: 20px auto;
+      width: 80%;
+      position: relative;
+      padding-bottom: 45%;
+      height: 0;
+    }
+    .video-wrapper iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Painéis de conteúdo -->
+  <div id="planet-6" style="display:none;">
+    <h2>Novidades.</h2>
+<P>Trazer novidades em tecnologia para a Dream Factory é motivo de grande alegria e entusiasmo. Cada nova solução implantada representa mais do que uma simples atualização de sistemas — é um passo à frente na construção de um ambiente digital mais inteligente, ágil e inovador. Ver ideias ganhando forma, processos se tornando mais eficientes e pessoas trabalhando com ferramentas que facilitam seu dia a dia é o que move nossa equipe. </P>
+<P>A tecnologia tem o poder de transformar desafios em oportunidades, e é com esse espírito que buscamos constantemente o novo: soluções que simplifiquem, conectem e inspirem. Cada avanço, cada melhoria e cada projeto implementado reforça o compromisso da Dream Factory em oferecer o melhor em experiência, desempenho e segurança digital. </P>
+<P>Mais do que evoluir sistemas, queremos evoluir pessoas. A verdadeira inovação acontece quando a tecnologia desperta curiosidade, amplia horizontes e potencializa talentos. Por isso, cada novidade tecnológica trazida para a Dream Factory é celebrada como uma conquista coletiva — fruto de trabalho, aprendizado e paixão por transformar o futuro em algo possível hoje. </P>
+<P>Inovar é sonhar com o amanhã e construir o hoje!</P>
+<P>💫 Todas as novidades, lançamentos e melhorias de tecnologia serão anunciadas com exclusividade no TIverso — o nosso espaço oficial de comunicação e descobertas digitais.
+Fique atento: é por lá que você ficará por dentro das inovações, dicas e experiências que tornam a Dream Factory cada vez mais conectada, moderna e inspiradora. </P>
+
+  </div>
+
+  <div id="planet-1" style="display:none;">
+    <h2>Chamados.</h2>
+  
+    <p>O SAT é a principal ferramenta para registrar e acompanhar solicitações, dúvidas ou problemas técnicos de forma organizada e rastreável. A abertura correta de um chamado é essencial para garantir agilidade, priorização adequada e histórico completo das demandas de cada colaborador ou setor.</p>
+    <p>Quando um problema é reportado diretamente a um colaborador da TI, sem o registro no painel, ele pode se perder, atrasar o atendimento ou até ficar sem registro formal, dificultando a gestão e o acompanhamento dos indicadores de suporte. Por isso, é indispensável que toda solicitação seja feita exclusivamente através do sistema de chamados (SAT).</p>
+    <p>Ao abrir um chamado, descreva de forma clara e detalhada o problema, incluindo prints, horários e qualquer informação que ajude a equipe a compreender a situação. Isso permite que o suporte técnico direcione o atendimento ao profissional correto e ofereça uma solução mais rápida e eficiente.</p>
+    <p>A utilização do painel também garante transparência e comunicação entre as áreas, permitindo acompanhar o status das demandas, o tempo de resposta e as ações tomadas.</p>
+    <p>Em caso de urgência crítica, o chamado deve ser aberto imediatamente e, em seguida, o colaborador pode entrar em contato com a equipe de TI para agilizar o processo.</p>
+    <p>Seguir esse fluxo é fundamental para manter a organização, eficiência e confiabilidade dos serviços internos da Dream Factory.</p>
+  </div>
+
+  <div id="planet-2" style="display:none;">
+    <h2>Segurança.</h2>
+    <p>Cada usuário é parte essencial na proteção das informações da empresa. A segurança digital não depende apenas de sistemas, antivírus ou políticas de TI — ela começa nas atitudes diárias de cada pessoa. Manter a tela do computador bloqueada ao se ausentar, usar senhas fortes e exclusivas, evitar compartilhá-las e desconfiar de e-mails ou links suspeitos são práticas simples que fazem uma grande diferença. Também é importante realizar backups regulares, manter dispositivos atualizados e evitar o uso de pendrives desconhecidos ou redes Wi-Fi públicas. </p>
+<p>Quando essas medidas são ignoradas, as consequências podem ser graves. Um simples descuido, como deixar a tela desbloqueada ou clicar em um link falso, pode expor dados sigilosos, comprometer sistemas inteiros e até causar prejuízos financeiros à empresa. Informações pessoais e corporativas podem ser roubadas, alteradas ou utilizadas em fraudes. Além disso, ataques cibernéticos muitas vezes exploram justamente falhas humanas — a pressa, a curiosidade ou o esquecimento de práticas básicas de segurança.  </p>
+<p>Cada clique, senha e acesso tem impacto direto na segurança de todos. Ao agir com atenção e responsabilidade, o usuário protege não apenas seus próprios dados, mas também os de colegas, clientes e parceiros. A falta de cuidado individual pode comprometer todo um ambiente corporativo, enquanto atitudes conscientes criam uma cultura digital segura e colaborativa. Segurança da informação é um compromisso coletivo — e cada usuário é o primeiro elo dessa corrente, responsável por manter a confiança, a integridade e a continuidade do trabalho de todos. </p>
+
+    <!--<div class="video-wrapper">
+      <iframe data-src="https://www.youtube.com/embed/farhUf3-1XE?rel=0&modestbranding=1&playsinline=1"
+              src="about:blank" loading="lazy" decoding="async"
+              allow="accelerometer; gyroscope; picture-in-picture; encrypted-media"
+              allowfullscreen></iframe>
+    </div>-->
+  </div>
+
+  <!-- 🪐 Boas Práticas (ajustada com lista) -->
+  <div id="planet-3" style="display:none;">
+    <h2>Boas Práticas.</h2>
+
+    <ul class="lista-boas-praticas">
+      <li>Utilize senhas fortes e exclusivas.</li>
+      <li>Evite clicar em links desconhecidos ou baixar arquivos de fontes não confiáveis.</li>
+      <li>Faça backups regulares dos seus dados importantes, preferencialmente em nuvem e em um dispositivo físico.</li>
+      <li>Use antivírus atualizado e evite compartilhar dispositivos sem necessidade. Tenha atenção ao uso de redes Wi-Fi públicas.</li>
+      <li>Pequenas atitudes de cuidado e organização digital reduzem riscos e aumentam a eficiência no trabalho, protegendo suas informações e garantindo uma experiência tecnológica mais segura e confiável.</li>
+    </ul>
+
+    <div class="video-wrapper">
+      <iframe data-src="https://www.youtube.com/embed/AT-4bPs27ic?rel=0&modestbranding=1&playsinline=1"
+              src="about:blank" loading="lazy" decoding="async"
+              allow="accelerometer; gyroscope; picture-in-picture; encrypted-media"
+              allowfullscreen></iframe>
+    </div>
+  </div>
+
+<div id="planet-4" style="display:none;">
+  <h2>Equipamentos.</h2>
+
+<p>Os equipamentos de tecnologia — como notebooks, celulares corporativos, monitores e periféricos — são ferramentas essenciais para o bom desempenho das atividades diárias. Para garantir a organização, o controle e a segurança do ambiente de TI, todas as solicitações relacionadas a equipamentos devem ser realizadas exclusivamente por meio do sistema <strong>SAT (Sistema de Atendimento em Tecnologia)</strong></p>
+<p>Caso o colaborador precise de um novo equipamento, a solicitação deve ser feita abrindo um chamado no SAT, informando a necessidade e a justificativa. Para trocas de equipamentos (por exemplo, substituição de um notebook antigo ou celular com mau funcionamento), o mesmo procedimento se aplica — sempre via sistema, com a devida autorização do gestor e da área de TI.</p>
+<p>Em situações de reparo ou defeito, o chamado no SAT deve conter o máximo de detalhes possíveis sobre o problema apresentado, permitindo um diagnóstico rápido e preciso. A equipe técnica avaliará se o reparo pode ser feito internamente ou se será necessário o envio para manutenção especializada.</p>
+<p>Zelar pelos equipamentos é uma responsabilidade individual e coletiva. Manter os dispositivos limpos, protegidos contra quedas, líquidos e altas temperaturas, além de utilizá-los apenas para fins profissionais, prolonga sua vida útil e reduz custos para a empresa. O cuidado diário demonstra comprometimento com os recursos disponibilizados e contribui para um ambiente tecnológico mais eficiente, seguro e sustentável.<br>
+<strong>Lembre-se:</strong> qualquer necessidade envolvendo equipamentos deve sempre começar com a abertura de um chamado no <a href="https://sat.dreamfactory.com.br" target="_blank" rel="noopener noreferrer">SAT – Sistema de Atendimento em Tecnologia</a>.</p>
+
+</div>
+
+  <div id="planet-5" style="display:none;">
+    <h2>Acesso ao Escritório.</h2>
+    <p>Acesso ao Escritório – Procedimentos e Orientações</p>
+    <p>O controle de acesso ao escritório da Dream Factory é uma medida essencial para garantir segurança, organização e rastreabilidade em todas as áreas da empresa. O acesso inicial de cada colaborador deve ser solicitado exclusivamente pelo departamento de Recursos Humanos (RH), responsável por comunicar à área de TI e validar as permissões adequadas.</p>
+    <p>Caso ocorra qualquer tipo de problema de acesso, como bloqueio de entrada, erro de leitura ou dificuldade no sistema, o colaborador deve abrir imediatamente um chamado no SAT, descrevendo o ocorrido de forma detalhada. Isso possibilita que o suporte técnico identifique e resolva a situação com agilidade e precisão.</p>
+    <p>Se o colaborador mudar de área, função ou precisar de um novo tipo de acesso, a solicitação deve ser feita por e-mail para <a href="mailto:ti@dreamfactory.com.br">ti@dreamfactory.com.br</a>, com o gestor direto em cópia, garantindo o registro formal e o controle da autorização.</p>
+    <p>É fundamental seguir essas orientações para manter a integridade e a segurança física e digital do ambiente corporativo. Qualquer irregularidade, dúvida ou urgência relacionada ao acesso deve ser reportada imediatamente ao departamento de TI, assegurando que todas as&nbsp;permissões permaneçam atualizadas e seguras.</p>
+  </div>
+
+  <div id="planet-7" style="display:none;">
+    <h2>Biblioteca de Recursos.</h2>
+    <p>Biblioteca de Recursos – Ferramentas para o Dia a Dia</p>
+    <p>A Biblioteca de Recursos da Dream Factory foi criada para centralizar todos os materiais que facilitam o trabalho e garantem padronização nas apresentações e comunicações internas e externas. Nesse espaço, os colaboradores encontram fontes oficiais, templates corporativos, logotipos atualizados, apresentações em PowerPoint (PPTs), fundos de tela para o Microsoft Teams, além de outros elementos visuais que representam a identidade da empresa.</p>
+    <p>A biblioteca é um ambiente seguro e colaborativo, pensado para que todos possam acessar rapidamente os arquivos necessários para reuniões, eventos, ativações, apresentações de projetos ou comunicações institucionais. Manter o uso desses materiais padronizados ajuda a fortalecer a imagem da Dream Factory e a garantir coerência visual em todos os pontos de contato da marca.</p>
+    <p>Recomenda-se que os colaboradores consultem sempre a biblioteca antes de elaborar qualquer material de apresentação, evitando o uso de versões antigas ou não oficiais.</p>
+    <p>A Biblioteca de Recursos pode ser acessada pelo link abaixo:</p>
+    <p>👉 <a href="https://dreamfactorybr-my.sharepoint.com/:f:/g/personal/workspace2_dreamfactory_com_br/EtnEzgfeaeZMvpQwkR6ZVrcBcvLlHriZ8beZNKRGB3Um9g?e=87yLYg" target="_blank" rel="noopener noreferrer">Acessar Biblioteca de Recursos Dream Factory</a></p>
+    <p>Em caso de dúvidas ou necessidade de novos materiais, entre em contato com o departamento de Comunicação ou TI para garantir o uso correto e atualizado de todos os recursos disponíveis.</p>
+  </div>
+
+  <!-- Tooltip -->
+  <div id="tooltip"></div>
+  <div id="tipping"></div>
+
+  <img id="reset-orbit" src="IMGS/orbita.webp" alt="Zerar Órbita" title="Zerar Órbita" onerror="this.src='IMGS/orbita.png'">
+
+  <footer>
+    © 2026 Criado no Laboratório de Tecnologia da Dream Factory - Todos os direitos reservados
+  </footer>
+
+  <div id="loading"></div>
+
+  <!-- Importmap Three.js -->
+  <script type="importmap">{
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }</script>
+
+  <script type="module" src="universo.js"></script>
+
+  <!-- Lazy load vídeos -->
+  <script>
+    (function(){
+      const iframes = document.querySelectorAll('iframe[data-src]');
+      const onIntersect = (entries, obs) => {
+        for (const e of entries) if (e.isIntersecting) {
+          const el = e.target;
+          el.src = el.dataset.src;
+          el.removeAttribute('data-src');
+          obs.unobserve(el);
+        }
+      };
+      const io = 'IntersectionObserver' in window ?
+        new IntersectionObserver(onIntersect, { rootMargin: '200px' }) : null;
+      if (io) iframes.forEach(i => io.observe(i));
+      else iframes.forEach(i => i.src = i.dataset.src);
+    })();
+  </script>
+
+</body>
+</html>
