@@ -1,0 +1,202 @@
+body {
+  margin: 0;
+  overflow: hidden;
+  cursor: default;
+  background: black;
+  font-family: 'Montserrat', 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+canvas { display: block; }
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #0088ff;
+  color: #000;
+  text-align: center;
+  padding: 3px 0;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  z-index: 200;
+}
+
+/* Titulações */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================
+   PAINÉIS DE CONTEÚDO
+   ============================================ */
+.planet-panel {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, 100%);
+  width: 70vw;
+  max-width: 900px;
+  height: 95vh;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid #0088ff;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  transition: transform 0.5s ease;
+  z-index: 100;
+  padding: 20px;
+  box-sizing: border-box;
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  overflow-y: auto;
+}
+
+/* 🔹 Todos os parágrafos dos painéis com 16px */
+.planet-panel p {
+  font-size: 16px;
+  line-height: 1.7;
+  margin-bottom: 14px;
+  font-family: 'Montserrat', sans-serif;
+  color: #ffffff;
+}
+
+/* Estilos para links nos painéis */
+.planet-panel a {
+  color: #66b3ff; /* Azul mais claro para links não visitados */
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.planet-panel a:visited {
+  color: #0088ff; /* Cor do footer para links visitados */
+}
+
+.planet-panel a:hover {
+  color: #88ccff; /* Azul claro ao passar o mouse */
+  text-decoration: underline;
+}
+
+.planet-panel a:active {
+  color: #0088ff; /* Cor do footer ao clicar */
+}
+
+/* Quando painel aberto */
+.planet-panel.open {
+  transform: translate(-50%, 0);
+  padding-bottom: 80px;
+}
+
+/* Botão fechar */
+.planet-panel button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 6px 12px;
+  cursor: pointer;
+  border: 1px solid #0088ff;
+  background: #222;
+  color: #0088ff;
+  border-radius: 4px;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* Tooltip */
+#tipping {
+  position: absolute;
+  padding: 2px 8px;
+  font-family: 'Space Grotesk', monospace;
+  font-size: 18px;
+  color: #0088ff;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid #0088ff;
+  border-radius: 4px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  white-space: nowrap;
+  z-index: 30;
+}
+
+/* ============================================
+   LISTA DE BOAS PRÁTICAS
+   ============================================ */
+.lista-boas-praticas {
+  margin: 20px 0 30px;
+  padding-left: 30px;
+  list-style-type: disc;
+  line-height: 1.7;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px; /* 🔹 Mesmo tamanho de texto */
+  color: #ffffff;
+}
+
+.lista-boas-praticas li {
+  margin-bottom: 10px;
+}
+
+.lista-boas-praticas li::marker {
+  color: #0088ff;
+  font-size: 18px;
+}
+
+/* ============================================
+   OUTRAS LISTAS (sem marcadores)
+   ============================================ */
+.planet-panel ul:not(.lista-boas-praticas) {
+  list-style: none;
+  padding-left: 0;
+  margin: 20px 0 30px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  color: #ffffff;
+}
+
+.planet-panel ul:not(.lista-boas-praticas) li {
+  margin-bottom: 10px;
+}
+
+/* ============================================
+   MOBILE
+   ============================================ */
+@media (max-width: 768px) {
+  .planet-panel {
+    position: fixed !important;
+    bottom: 0 !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100vh !important;
+    border-radius: 0 !important;
+    transform: translateY(100%) !important;
+  }
+
+  .planet-panel.open {
+    transform: translateY(0) !important;
+    padding-bottom: 80px;
+  }
+
+  .planet-panel p {
+    font-size: 15px; /* 🔸 ligeiro ajuste no mobile pra leitura */
+  }
+
+  footer {
+    font-size: 10px;
+    padding: 2px 0;
+  }
+
+  .planet-panel button {
+    font-size: 70%;
+    padding: 5px 11px;
+  }
+
+  canvas { touch-action: none; }
+  #tipping { display: none !important; }
+}
